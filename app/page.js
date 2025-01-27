@@ -26,17 +26,28 @@ export default function Home() {
 
   const getHint = () => {
     if (wordList.length === 0) return;
+
     const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-    const randomIndex = Math.floor(Math.random() * (randomWord.length - 2)); // Ensure the substring is at least 2 characters
-    const hintSubstring = randomWord.slice(randomIndex, randomIndex + 2); // Get a substring of length 2
+    const hintLength = Math.random() < 0.5 ? 2 : 3; // Randomly choose a hint length (2 or 3)
+    const maxStartIndex = randomWord.length - hintLength;
+
+    if (maxStartIndex < 0) return getHint(); // Skip words that are too short for the chosen hint length
+
+    const randomIndex = Math.floor(Math.random() * (maxStartIndex + 1));
+    const hintSubstring = randomWord.slice(randomIndex, randomIndex + hintLength); // Generate hint of chosen length
     setHint(hintSubstring);
 
     // Filter valid words that contain the hint
-    const validWordsForHint = wordList.filter((word) => word.includes(hintSubstring));
+    const validWordsForHint = wordList.filter(
+      (word) => word.length > hintLength && word.includes(hintSubstring) // Ensure the word is longer than the hint
+    );
     setValidWords(validWordsForHint);
   };
 
+
+
   const checkGuess = () => {
+    // Check if the guessed word is valid
     if (validWords.some((word) => word.toLowerCase() === guess.toLowerCase())) {
       toast.success('Correct.');
       nextRound();
@@ -46,8 +57,9 @@ export default function Home() {
     }
   };
 
+
   const nextRound = () => {
-    const newTimeLeft = Math.floor(Math.random() * (20 - 10 + 1)) + 10; // Generate new time
+    const newTimeLeft = Math.floor(Math.random() * (15 - 7 + 1)) + 7; // Generate new time
     setGuess('');
     setTimeLeft(newTimeLeft); // Reset timer
     getHint(); // Generate a new hint
@@ -88,14 +100,14 @@ export default function Home() {
   }, [wordList]);
 
   return (
-    
+
     <div className="min-h-screen md:h-screen md:py-20 flex flex-col items-center justify-center bg-green-200 text-gray-900 font-bold">
       <h1 className="text-4xl text-center mx-6 mb-6 uppercase">Word Guessing Game</h1>
       <div className="p-8 border-4 mx-6 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
         {!gameOver ? (
           <>
             <div className='flex justify-between items-center mb-4'>
-            <p> Time left : {timeLeft}</p>
+              <p> Time left : {timeLeft}</p>
               <p className="flex text-lg">{currentLives}</p>
             </div>
             <p className="text-lg mb-4">
