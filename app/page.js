@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaHeart } from "react-icons/fa";
-import { Player } from '@lottiefiles/react-lottie-player';
 
 
 export default function Home() {
@@ -14,21 +13,6 @@ export default function Home() {
   const [lives, setLives] = useState(3);
   const [timeLeft, setTimeLeft] = useState(10);
   const [gameOver, setGameOver] = useState(false);
-  const [lottieKey, setLottieKey] = useState(0); // Key to reset animation
-
-  const lottieDefaultDuration = 7.8; // Assume the Lottie animation is 3 seconds long
-  const playbackSpeed = lottieDefaultDuration / timeLeft; // Adjust speed to match timeLeft
-
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Indicate that the component is now running on the client
-  }, []);
-
-  if (!isClient) {
-    return null; // Render nothing on the server side
-  }
-
   const fetchWordList = async () => {
     try {
       const response = await fetch('/words.txt'); // Fetch the words.txt file
@@ -66,7 +50,6 @@ export default function Home() {
     const newTimeLeft = Math.floor(Math.random() * (20 - 10 + 1)) + 10; // Generate new time
     setGuess('');
     setTimeLeft(newTimeLeft); // Reset timer
-    setLottieKey((prevKey) => prevKey + 1); // Reset the Lottie animation
     getHint(); // Generate a new hint
   };
 
@@ -111,17 +94,10 @@ export default function Home() {
       <div className="p-8 border-4 mx-6 border-black shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
         {!gameOver ? (
           <>
-            <div className='flex justify-end items-center mb-4'>
-
+            <div className='flex justify-between items-center mb-4'>
+            <p> Time left : {timeLeft}</p>
               <p className="flex text-lg">{currentLives}</p>
             </div>
-            <Player
-              key={lottieKey} // Reset animation on key change
-              autoplay
-              loop={false} // Play only once
-              src="/bom.json" // Path to your Lottie file
-              speed={playbackSpeed} // Adjust speed to match timeLeft
-            />
             <p className="text-lg mb-4">
               Hint: <span className="bg-black text-green-200 px-2">{hint}</span>
             </p>
