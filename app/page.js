@@ -19,6 +19,16 @@ export default function Home() {
   const lottieDefaultDuration = 7.8; // Assume the Lottie animation is 3 seconds long
   const playbackSpeed = lottieDefaultDuration / timeLeft; // Adjust speed to match timeLeft
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Indicate that the component is now running on the client
+  }, []);
+
+  if (!isClient) {
+    return null; // Render nothing on the server side
+  }
+
   const fetchWordList = async () => {
     try {
       const response = await fetch('/words.txt'); // Fetch the words.txt file
